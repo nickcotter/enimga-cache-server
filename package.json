@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/nickcotter/enimga-cache-server#readme",
   "dependencies": {
+    "crypto-js": "^4.0.0",
     "express": "^4.17.1"
   }
 }
