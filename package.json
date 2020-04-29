@@ -4,7 +4,7 @@
   "description": "A service to store data keyed by geographical coordinates",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js"
   },
   "repository": {
     "type": "git",
@@ -18,9 +18,12 @@
   },
   "homepage": "https://github.com/nickcotter/enimga-cache-server#readme",
   "dependencies": {
+    "@google-cloud/datastore": "^5.1.0",
     "body-parser": "^1.19.0",
     "crypto-js": "^4.0.0",
+    "esm": "^3.2.25",
     "express": "^4.17.1",
-    "nedb": "^1.8.0"
+    "nedb": "^1.8.0",
+    "uuid": "^7.0.3"
   }
 }

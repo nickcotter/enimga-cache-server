@@ -1,69 +1,101 @@
-var Datastore = require('nedb') , db = new Datastore();
+var nedb = require('nedb') , db = new nedb();
+
+import { v4 as uuidv4 } from 'uuid';
+
+const {Datastore} = require('@google-cloud/datastore');
+const datastore = new Datastore();
 
 var express = require('express');
 var router = express.Router();
 
-router.get('/:geokey/list', (req, res) => {
+
+const getEntities = (geokey) => {
+    const query = datastore
+      .createQuery('EnigmaCache', 'Entity')
+      .filter('geokey', geokey);
+
+    return datastore.runQuery(query);
+};
+
+router.get('/:geokey/list', async (req, res) => {
 
     var geokey = req.params.geokey;
 
-    db.find({ geokey: geokey}, function (err, docs) {
-        res.json(docs);
-      });
+    const [entities] = await getEntities(geokey);
+
+    res.json(entities).end();
 });
 
-router.get('/:geokey/:id', (req, res) => {
+const getEntity = (id, geokey) => {
+    const query = datastore
+      .createQuery('EnigmaCache', 'Entity')
+      .filter('geokey', geokey)
+      .filter('id', id);
+
+    return datastore.runQuery(query);
+};
+
+router.get('/:geokey/:id', async (req, res) => {
 
     var geokey = req.params.geokey;
     var id = req.params.id;
 
-    db.findOne({ geokey: geokey, _id: id}, function (err, doc) {
-        res.json(doc);
-      });
+    const [entities] = await getEntity(id, geokey);
+
+    if(!entities || entities.length == 0) {
+        res.status(404).end();
+    } else{
+        res.json(entities[0]).end();
+    }
 
 });
 
-router.post('/:geokey', function(req, res) {
 
-    var geokey = req.params.geokey;
-    var content = req.body;
+const addEntity = (id, geokey, content) => {
 
-    console.log('adding new entity', geokey, content);
-
-    var entity = {
-        geokey: geokey,
-        content: content
-    };
-
-    db.insert(entity, function(err, savedEntity) {
-        if(!err) {
-            res.json({id: savedEntity._id});
+    return datastore.save({
+        key: datastore.key({namespace: 'EnigmaCache', path: ["Entity", id]}),
+        data: {
+            id: id,
+            geokey: geokey,
+            content: content
         }
     });
-});
+};
 
-router.put('/:geokey/:id', function(req, res) {
+router.post('/:geokey', async (req, res) => {
 
     var geokey = req.params.geokey;
-    var id = req.params.id;
     var content = req.body;
 
-    var updatedEntity = {
-
-        geokey: geokey,
-        _id: id,
-        content: content
-    };
-
-    db.update({ geokey: geokey, _id: id }, updatedEntity, {}, function (err, numReplaced) {
+    const id = uuidv4();
     
-        if(!err && numReplaced == 1) {
-            res.sendStatus(200);
-        } else {
-            res.sendStatus(400);
+    await addEntity(id, geokey, content);
+
+    res.json({id: id}).end();
+});
+
+const updateEntity = (id, geokey, content) => {
+
+    return datastore.update({
+        key: datastore.key({namespace: 'EnigmaCache', path: ["Entity", id]}),
+        data: {
+            id: id,
+            geokey: geokey,
+            content: content
         }
     });
+};
 
+router.put('/:geokey/:id', async (req, res) => {
+
+    var geokey = req.params.geokey;
+    var id = req.params.id;
+    var content = req.body;
+
+    await updateEntity(id, geokey, content);
+
+    res.status(200).end();
 });
 
 module.exports = router;
