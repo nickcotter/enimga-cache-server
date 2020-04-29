@@ -1,5 +1,3 @@
-var nedb = require('nedb') , db = new nedb();
-
 import { v4 as uuidv4 } from 'uuid';
 
 const {Datastore} = require('@google-cloud/datastore');
