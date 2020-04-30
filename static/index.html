@@ -1,104 +1,56 @@
 <html>
+
 <head>
-<title>Test</title>
+    <title>Enigma Cache</title>
 
-<script type="text/javascript" src="bundle.js"></script>
-
-
-<script type="text/javascript" >
-
-CryptoJS = require('crypto-js')
-
-generateKey = function(latitude, longitude) {
-    plainKey = latitude + ":" + longitude;
-    key = btoa(CryptoJS.SHA256(plainKey));
-    return key;
-}
-
-encryptMessage = function(key, message) {
-    enc = CryptoJS.AES.encrypt(message, key);
-    return enc;
-}
-
-decryptMessage = function(key, message) {
-    dec = CryptoJS.AES.decrypt(message, key);
-    return dec;
-}
-
-locationFoundHandler = function(position) {
-
-    lat = position.coords.latitude.toFixed(4);
-    lon = position.coords.longitude.toFixed(4);
-
-
-    document.getElementById("latitude").value = lat;
-    document.getElementById("longitude").value = lon;
-
-    key = generateKey(lat, lon);
-    document.getElementById("generatedKey").value = key;
-
-    plainText = document.getElementById("plainText").value;
-    enc = encryptMessage(key, plainText);
-    document.getElementById("encryptedText").value = btoa(enc);
-
-    decrypted = decryptMessage(key, enc);
-    document.getElementById("decryptedText").value = decrypted.toString(CryptoJS.enc.Utf8);;
-}
-
-locationNotFoundHandler = function(error) {
-    alert("error finding location: " + error);
-}
-
-getLocation = function(event) {
-    if(navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(locationFoundHandler, locationNotFoundHandler);
-    } else {
-        alert("location finding not allowed");
-    }
-}
-
-</script>
-
-
+    <script type="text/javascript" src="bundle.js"></script>
+    <script type="text/javascript" src="enigma-cache.js"></script>
 
 </head>
+
 <body>
 
-<textarea id="plainText" rows="5" cols="50"></textarea>
+    <form>
+        <fieldset>
+            <input type="button" id="findButton" value="Find Me" />
 
-<hr />
+            <label for="latitude">Latitude</label>
+            <input type="text" id="latitude" size="10" />
 
-<input type="button" value="Where Am I?" id="findButton" />
+            <label for="longitude">Longitude</label>
+            <input type="text" id="longitude" size="10" />
+        </fieldset>
 
-<hr />
+        <input type="hidden" id="geokey" />
+    </form>
 
-<form>
-    <label for="latitude">Latitude</label>
-    <input type="text" id="latitude" size="10" />
-
-    <label for="longitude">Longitude</label>
-    <input type="text" id="longitude" size="10"/>
-
-    <br />
-
-    <label for="generatedKey">Key</label>
-    <input type="text" id="generatedKey" size="40" />
 
     <hr />
 
-    <label for="encryptedText">Encrypted</label><br />
-    <textarea id="encryptedText" rows="5" cols="50"></textarea>
+    <form>
+   
+        <input type="button" id="addNewButton" value="Add New" />
 
-    <hr />
+        <fieldset id="newEntryFields">
+            <label for="titleField">Title</label>
+            <input type="text" id="titleField" width="100%"/>
 
-    <label for="decryptedText">Decrypted</label><br />
-    <textarea id="decryptedText" rows="5" cols="50"></textarea>
-</form>
+            <br />
 
+            <label for="textArea">Text</label>
+            <textarea id="textArea" placeholder="Enter some text..." width="100%"></textarea>
 
-<script type="text/javascript" >
-    document.getElementById("findButton").addEventListener("click", getLocation);
-</script>
+            <input type="button" id="saveButton" value="Save" />
+        </fieldset>
+
+    </form>
+   
+
+    <script type="text/javascript">
+        document.getElementById("findButton").addEventListener("click", findLocation);
+        document.getElementById("addNewButton").addEventListener("click", addNewEntity);
+    </script>
 
 </body>
+
 </html>
