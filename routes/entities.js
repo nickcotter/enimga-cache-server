@@ -91,7 +91,8 @@ router.put('/:geokey/:id', async (req, res) => {
     var id = req.params.id;
     var content = req.body;
 
-    await updateEntity(id, geokey, content);
+    // disabled https://github.com/nickcotter/enimga-cache-server/issues/3
+    // await updateEntity(id, geokey, content);
 
     res.status(200).end();
 });
