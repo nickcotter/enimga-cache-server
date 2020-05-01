@@ -79,6 +79,8 @@ const loadEntities = async (geokey) => {
     let entities = await response.json();
 
     entities.forEach(addEntityToList);
+
+    console.log("loaded " + entities.length + " entities");
 };
 
 const geokeyLoaded = async (geokey) => {
@@ -115,14 +117,17 @@ const addNewEntity = async (event) => {
 
     let result = await response.json();
 
-    // reset form
+    console.log("new entity id", result);
+
+    resetAddNewEntityForm();
+
+    await loadEntities(geokey);
+};
+
+const resetAddNewEntityForm = () => {
     document.getElementById("titleField").value = "";
     document.getElementById("textArea").value = "";
     document.querySelector('#addNewButton').disabled = true;
-
-    console.log("new entity id", result);
-
-    await loadEntities(geokey);
 };
 
 const checkAddNewAllowed = (event) => {
@@ -138,8 +143,6 @@ const checkAddNewAllowed = (event) => {
         button.disabled = true;
     }
 };
-
-// main wiring
 
 const findLocation = (event) => {
     if (navigator.geolocation) {
