@@ -6,6 +6,17 @@
     <script type="text/javascript" src="bundle.js"></script>
     <script type="text/javascript" src="enigma-cache.js"></script>
 
+    <style>
+        .fullWidth * {
+            width: 100%;
+        }
+
+        .geokeyDependent {
+            display: none;
+        }
+
+    </style>
+
 </head>
 
 <body>
@@ -24,27 +35,42 @@
         <input type="hidden" id="geokey" />
     </form>
 
+    <br />
 
-    <hr />
+    <div class="geokeyDependent">
 
-    <form>
-   
-        <input type="button" id="addNewButton" value="Add New" />
+        <form class="entryForm">
 
-        <fieldset id="newEntryFields">
-            <label for="titleField">Title</label>
-            <input type="text" id="titleField" width="100%"/>
+            <fieldset id="newEntryFields" class="fullWidth">
+                <label for="titleField">Title</label>
+                <input type="text" id="titleField" />
 
-            <br />
+                <br />
 
-            <label for="textArea">Text</label>
-            <textarea id="textArea" placeholder="Enter some text..." width="100%"></textarea>
+                <label for="textArea">Text</label>
+                <textarea id="textArea" placeholder="Enter some text..." rows="10"></textarea>
 
-            <input type="button" id="saveButton" value="Save" />
-        </fieldset>
+                <input type="button" id="addNewButton" value="Add New"/>
+            </fieldset>
 
-    </form>
-   
+        </form>
+
+        <br />
+
+        <dl id="entryList">
+            <dt>a title</dt>
+            <dd>the content of that title</dd>
+            <dt>a title</dt>
+            <dd>the content of that title</dd>
+            <dt>a title</dt>
+            <dd>the content of that title</dd>
+            <dt>a title</dt>
+            <dd>the content of that title</dd>
+        </dl>
+
+    </div>
+
+
 
     <script type="text/javascript">
         document.getElementById("findButton").addEventListener("click", findLocation);

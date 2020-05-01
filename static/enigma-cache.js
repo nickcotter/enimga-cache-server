@@ -1,6 +1,24 @@
 CryptoJS = require('crypto-js')
 
 
+// visual stuff
+
+const show = (elem) => {
+	elem.style.display = 'block';
+};
+
+const hide = (elem) => {
+	elem.style.display = 'none';
+};
+
+
+const removeChildren = (id) => {
+    const parentNode = document.getElementById(id);
+    while(parentNode.firstChild) {
+        parentNode.removeChild(parentNode.lastChild);
+    }
+};
+
 // encryption
 
 const generateKey = (coordinates) => {
@@ -33,42 +51,73 @@ const geoLookup = (successCallback, errorCallback) => {
     );
 };
 
+// ui
 
-// listing
+const addEntityToList = (entity) => {
 
-const getEntities = async (geokey) => {
-    var xhr = new XMLHttpRequest();
-    return new Promise(function (resolve, reject) {
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState == 4) {
-                if (xhr.status >= 300) {
-                    reject("Error, status code = " + xhr.status)
-                } else {
-                    resolve(xhr.responseText);
-                }
-            }
-        }
-        xhr.open('get', '/entities/'+geokey+'/list', true);
-        xhr.send();
-    });
+    console.log('adding entity to list', entity);
+
+    const listNode = document.getElementById("entryList");
+
+    const titleNode = document.createElement("dt");
+    titleNode.appendChild(document.createTextNode(entity.content.title));
+
+    const textNode = document.createElement("dd");
+    textNode.appendChild(document.createTextNode(entity.content.text));
+
+    listNode.appendChild(titleNode);
+    listNode.appendChild(textNode);
 };
 
-const displayEntities = async (geokey) => {
+const loadEntities = async (geokey) => {
 
-    try {
-        let entities = await getEntities(geokey);
+    console.log("loading entities for geokey", geokey);
 
-        console.log('entities', entities);
+    removeChildren("entryList");
 
-    } catch(error) {
-        console.log(error);
-    }
+    let response = await fetch("/entities/" + geokey + "/list");
+    let entities = await response.json();
 
+    entities.forEach(addEntityToList);
 };
 
-const addNewEntity = (event) => {
+const geokeyLoaded = async (geokey) => {
 
+    Array.from(document.getElementsByClassName("geokeyDependent")).forEach(show);
+
+    document.getElementById("geokey").value = geokey;
     
+    await loadEntities(geokey);
+
+};
+
+const addNewEntity = async (event) => {
+
+    console.log('adding new entity');
+
+    const title = document.getElementById("titleField").value;
+    const text = document.getElementById("textArea").value;
+    const geokey = document.getElementById("geokey").value;
+
+    const content = {
+        title: title,
+        text: text
+    };
+
+    let response = await fetch("/entities/" + geokey, {
+        method: 'post',
+        headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+          },
+        body: JSON.stringify(content)
+    });
+
+    let result = await response.json();
+
+    console.log("result of post", result);
+
+    await loadEntities(geokey);
 };
 
 const findLocation = (event) => {
@@ -77,12 +126,9 @@ const findLocation = (event) => {
             document.getElementById("latitude").value = coords.latitude;
             document.getElementById("longitude").value = coords.longitude;
 
+            const geokey = generateKey(coords);
 
-            var geokey = generateKey(coords);
-
-            document.getElementById("geokey").value = geokey;
-
-            displayEntities(geokey);
+            geokeyLoaded(geokey);
 
         }, (error) => { console.log('error:', error) });
     } else {
