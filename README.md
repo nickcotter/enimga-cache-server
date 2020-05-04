@@ -2,6 +2,13 @@
 A service to store data keyed by geographical coordinates
 
 
+Building The Client JavaScript
+-------------------------------
+
+> browserify -r crypto-js -o static/crypto-js-bundle.js
+> browserify -r escape-html -o static/escape-html-bundle.js
+
+
 To Run Locally
 --------------
 

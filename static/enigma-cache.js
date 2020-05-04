@@ -1,5 +1,5 @@
 CryptoJS = require('crypto-js')
-
+escapeHtml = require('escape-html')
 
 // visual stuff
 
@@ -72,13 +72,11 @@ const addEntityToList = (entity) => {
     const decryptedTitle = decryptMessage(key, atob(entity.content.title)).toString(CryptoJS.enc.Utf8);
     const decryptedText = decryptMessage(key, atob(entity.content.text)).toString(CryptoJS.enc.Utf8);
 
-    console.log('title', decryptedTitle);
-
     const titleNode = document.createElement("dt");
-    titleNode.appendChild(document.createTextNode(decryptedTitle));
+    titleNode.appendChild(document.createTextNode(escapeHtml(decryptedTitle)));
 
     const textNode = document.createElement("dd");
-    textNode.appendChild(document.createTextNode(decryptedText));
+    textNode.appendChild(document.createTextNode(escapeHtml(decryptedText)));
 
     listNode.appendChild(titleNode);
     listNode.appendChild(textNode);
@@ -92,8 +90,6 @@ const loadEntities = async (geokey) => {
 
     let response = await fetch("/entities/" + geokey + "/list");
     let entities = await response.json();
-
-    console.log('entities', entities);
 
     entities.forEach(addEntityToList);
 
