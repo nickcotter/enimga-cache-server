@@ -25,7 +25,7 @@ const generateKey = (coordinates) => {
 
     const plainKey = coordinates.latitude + ":" + coordinates.longitude;
 
-    return btoa(CryptoJS.SHA256(plainKey));
+    return CryptoJS.SHA256(plainKey);
 };
 
 const encryptMessage = (key, message) =>  {
@@ -67,7 +67,7 @@ const addEntityToList = (entity) => {
 
     const listNode = document.getElementById("entryList");
 
-    const key = entity.geokey;
+    const key = atob(entity.geokey);
 
     const decryptedTitle = decryptMessage(key, atob(entity.content.title)).toString(CryptoJS.enc.Utf8);
     const decryptedText = decryptMessage(key, atob(entity.content.text)).toString(CryptoJS.enc.Utf8);
@@ -118,9 +118,11 @@ const addNewEntity = async (event) => {
     const text = document.getElementById("textArea").value;
     const geokey = document.getElementById("geokey").value;
 
+    const key = atob(geokey);
+
     const content = {
-        title: btoa(encryptMessage(geokey, title)),
-        text: btoa(encryptMessage(geokey, text))
+        title: btoa(encryptMessage(key, title)),
+        text: btoa(encryptMessage(key, text))
     };
 
     console.log('entity to save', content);
