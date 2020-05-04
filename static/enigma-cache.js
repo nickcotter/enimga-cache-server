@@ -28,6 +28,14 @@ const generateKey = (coordinates) => {
     return btoa(CryptoJS.SHA256(plainKey));
 };
 
+const encryptMessage = (key, message) =>  {
+    return CryptoJS.AES.encrypt(message, key);
+};
+
+const decryptMessage = (key, message) => {
+    return CryptoJS.AES.decrypt(message, key);
+};
+
 
 // geo location
 
@@ -59,11 +67,18 @@ const addEntityToList = (entity) => {
 
     const listNode = document.getElementById("entryList");
 
+    const key = entity.geokey;
+
+    const decryptedTitle = decryptMessage(key, atob(entity.content.title)).toString(CryptoJS.enc.Utf8);
+    const decryptedText = decryptMessage(key, atob(entity.content.text)).toString(CryptoJS.enc.Utf8);
+
+    console.log('title', decryptedTitle);
+
     const titleNode = document.createElement("dt");
-    titleNode.appendChild(document.createTextNode(entity.content.title));
+    titleNode.appendChild(document.createTextNode(decryptedTitle));
 
     const textNode = document.createElement("dd");
-    textNode.appendChild(document.createTextNode(entity.content.text));
+    textNode.appendChild(document.createTextNode(decryptedText));
 
     listNode.appendChild(titleNode);
     listNode.appendChild(textNode);
@@ -77,6 +92,8 @@ const loadEntities = async (geokey) => {
 
     let response = await fetch("/entities/" + geokey + "/list");
     let entities = await response.json();
+
+    console.log('entities', entities);
 
     entities.forEach(addEntityToList);
 
@@ -102,9 +119,11 @@ const addNewEntity = async (event) => {
     const geokey = document.getElementById("geokey").value;
 
     const content = {
-        title: title,
-        text: text
+        title: btoa(encryptMessage(geokey, title)),
+        text: btoa(encryptMessage(geokey, text))
     };
+
+    console.log('entity to save', content);
 
     let response = await fetch("/entities/" + geokey, {
         method: 'post',

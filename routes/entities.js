@@ -51,6 +51,8 @@ router.get('/:geokey/:id', async (req, res) => {
 
 const addEntity = (id, geokey, content) => {
 
+    console.log('adding entity', id, geokey, content);
+
     return datastore.save({
         key: datastore.key({namespace: 'EnigmaCache', path: ["Entity", id]}),
         data: {
