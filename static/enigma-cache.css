@@ -5,3 +5,15 @@
 .geokeyDependent {
     display: none;
 }
+
+input[type=button] {
+    border: 2px solid; 
+}
+
+input[type=text], textarea {
+    border: 2px solid;    
+}
+
+body * {
+    padding: 5px;
+}
